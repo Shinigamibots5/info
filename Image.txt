@@ -1,0 +1,42 @@
+from telegram import Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, CallbackContext
+
+# Add your bot token here
+TOKEN = 'YOUR_BOT_TOKEN'
+
+def start(update: Update, context: CallbackContext) -> None:
+    """Send a message when the command /start is issued."""
+    user = update.effective_user
+    message = f"Hi {user.first_name}!\n\nWelcome to the group info bot. Use the /help command to see available commands."
+    context.bot.send_photo(chat_id=update.effective_chat.id, photo=open('image.jpg', 'rb'), caption=message, parse_mode=ParseMode.MARKDOWN, reply_markup=get_start_buttons())
+    
+def get_start_buttons():
+    """Return inline keyboard with buttons"""
+    buttons = [
+        [InlineKeyboardButton("Button 1", callback_data='button1')],
+        [InlineKeyboardButton("Button 2", callback_data='button2')]
+    ]
+    return InlineKeyboardMarkup(buttons)
+    
+def button_callback(update: Update, context: CallbackContext) -> None:
+    """Handle button callbacks"""
+    query = update.callback_query
+    data = query.data
+    
+    # Handle button1 callback
+    if data == 'button1':
+        query.answer("Button 1 pressed!")
+        # Add your code for handling button1 press here
+        
+    # Handle button2 callback
+    elif data == 'button2':
+        query.answer("Button 2 pressed!")
+        # Add your code for handling button2 press here
+    
+    # If the callback query is not handled by any of the above conditions
+    else:
+        query.answer("Invalid button!")
+        return
+    
+    # After handling the button press, delete the inline keyboard
+    query.message.reply_text('You pressed a button!', reply_markup=InlineKeyboardMarkup([]))
